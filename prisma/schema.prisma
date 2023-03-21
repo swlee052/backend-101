@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id     Int     @id @map("customer_id")
+  name   String  @map("customer_name") @db.VarChar(50)
+  email  String  @map("email") @db.VarChar(50)
+  orders Order[] 
+
+  @@index([email], map: "idx_customer_email")
+  @@map("customers")
+}
+
+model Order {
+  id         Int        @id @map("order_id")
+  customerId Int        @map("customer_id")
+  date       DateTime?  @map("order_date") @db.Date
+  amount     Decimal?   @map("total_amount") @db.Decimal(10, 2)
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "orders_ibfk_1")
+
+  @@index([customerId], map: "customer_id")
+  @@map("orders")
+}
